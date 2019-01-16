@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+</head>
+<body>
+<% for(var shortkey in urls){ %>
+  <ul>
+    <li>Shortened Form: <strong> <%= shortkey %> </strong></li>
+    <li>Full URL: <strong> <%= urls[shortkey] %> </strong></li>
+    <a href="/urls/<%= shortkey %> ">Edit</a>
+    <form method="POST" action="/urls/<%= shortkey %>/delete">
+    <button type="submit" > Delete URL</button>
+</form>
+
+  </ul>
+<% } %>
+
+
+
+
+<a href="#">Shorten URL</a>
+</body>
+</html>
