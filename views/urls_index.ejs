@@ -4,19 +4,20 @@
   <title>TinyApp</title>
 </head>
 <body>
-<% for(var shortkey in urls){ %>
+  <% include ./partials/_header.ejs %>
+  <% for(var shortkey in urls){ %>
   <ul>
     <li>Shortened Form: <strong> <%= shortkey %> </strong></li>
     <li>Full URL: <strong> <%= urls[shortkey] %> </strong></li>
     <a href="/urls/<%= shortkey %> ">Edit</a>
     <form method="POST" action="/urls/<%= shortkey %>/delete">
     <button type="submit" > Delete URL</button>
-</form>
+    </form>
 
   </ul>
 <% } %>
 
-
+<h2><%= username %> </h2>
 
 
 <a href="#">Shorten URL</a>
