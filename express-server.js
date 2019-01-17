@@ -23,7 +23,6 @@ const users = {
     password: "dishwasher-funk"
   },
 }
-
 var urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
@@ -85,25 +84,34 @@ app.post("/urls/:id", (req, res) => {
   res.redirect('/urls');
 });
 
-
-
-
-
-
+app.get("/login", (req, res) => {
+let templateVars = {
+    user: users[req.cookies.user_id]
+  };
+res.render("login");
+});
 
 app.post("/login", (req, res) => {
   var userEmail = req.body.userEmail;
- if(!userEmail){
-   return res.status(400).send("Field required");
+  var userPassword = req.body.password;
+  var user_id = "";
+  var flag = true;
+ if(!userEmail || !userPassword){
+   return res.status(400).send(" Both fields are required");
   }
   for (var key in users ){
       if(users[key]['email'] === userEmail){
         user_id = users[key]['id'];
-        break;
+        flag = false;
       }
-    }
+  }
+  if(flag){
+    return res.status(403).send("User not registered")
+  }
+  if(users[user_id]['password'] !== userPassword){
+    return res.status(403).send("password is wrong");
+  }
   res.cookie("user_id", user_id);
-
   res.redirect("/urls");
 });
 
@@ -137,7 +145,6 @@ app.post("/register", (req, res) => {
   "email": userEmail,
   "password" : userPassword
   }
-  res.cookie("user_id", users[id]['id']);
   res.redirect("/urls");
 });
 

@@ -1,25 +1,17 @@
 
-<% if(typeof(user) !== "undefined" && user){ %>
+<a href="/login">Login</a>
+<a href="/register">Register</a>
 
+
+
+
+<% if(typeof(user) !== "undefined" && user){ %>
   <h2><%= user['email']%> </h2>
   <form method="POST" action="/logout">
     <button type="submit">Logout</button>
   </form>
 
-<% } else { %>
-
- <h2>Login</h2>
-<form method="POST" action="/login">
-  <input type="text" name="userEmail">
-  <button type="submit">Submit</button>
-</form>
-
 <% } %>
-
-
-
-
-
 
 
 
