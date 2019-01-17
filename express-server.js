@@ -107,7 +107,7 @@ app.post("/register", (req, res) => {
 
   //Handling Errors
   if(!userEmail || !userPassword){
-    res.status(400).send('Both fields are required');
+   return res.status(400).send("Both fields are required");
   }
 
     for (var key in users ){
