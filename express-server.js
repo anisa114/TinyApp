@@ -44,10 +44,16 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  var user = users[req.cookies.user_id];
   let templateVars = {
     user: users[req.cookies.user_id]
   };
+if(typeof(user) === "undefined" && !user){
+  res.redirect("/login");
+}
+else{
   res.render("urls_new", templateVars);
+}
 });
 
 app.post("/urls", (req, res) => {

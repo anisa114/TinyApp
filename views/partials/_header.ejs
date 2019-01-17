@@ -3,8 +3,6 @@
 <a href="/register">Register</a>
 
 
-
-
 <% if(typeof(user) !== "undefined" && user){ %>
   <h2><%= user['email']%> </h2>
   <form method="POST" action="/logout">
