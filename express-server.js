@@ -22,13 +22,6 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   },
-
-  "user3RandomID": {
-    id: "user3RandomID",
-    email: "user3@example.com",
-    password: "apple"
-  }
-
 }
 
 var urlDatabase = {
@@ -110,20 +103,27 @@ app.post("/logout", (req, res) => {
 app.post("/register", (req, res) => {
   var userEmail = req.body.email;
   var userPassword = req.body.password;
-  var newUsers = {};
   var id = generateRandomString();
-  newUsers[id]= {
+
+  //Handling Errors
+  if(!userEmail || !userPassword){
+    res.status(400).send('Both fields are required');
+  }
+
+    for (var key in users ){
+      if(users[key]['email'] === userEmail){
+      res.status(400).send("User already exists");
+      }
+    }
+
+  users[id]= {
   "id" : id,
   "email": userEmail,
   "password" : userPassword
   }
-  res.cookie("user_id", newUsers[id]['id']);
+  res.cookie("user_id", users[id]['id']);
   res.redirect("/urls");
 });
-
-
-
-
 
 
 app.listen(PORT, () => {
