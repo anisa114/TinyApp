@@ -39,14 +39,14 @@ return Math.random().toString(36).substring(6);
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    user: req.cookies["user"]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"]
+    user: req.cookies["user"]
   };
   res.render("urls_new", templateVars);
 });
@@ -67,7 +67,7 @@ app.get("/urls/:id", (req, res) => {
    let templateVars = {
     urls: urlDatabase,
     shortURL: req.params.id,
-    username: req.cookies["username"]
+    userEmail: req.cookies["user"].email
   };
   res.render("urls_show", templateVars);
 });
@@ -86,13 +86,18 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.post("/login", (req, res) => {
-  var username = req.body.username;
-  res.cookie("username", username);
+  var userEmail = req.body.userEmail;
+  for (var key in users ){
+      if(users[key]['email'] === userEmail){
+      var user_id = users[key]['id'];
+      }
+    }
+  res.cookie("user", users[user_id]);
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("username");
+  res.clearCookie("user");
   res.redirect("/urls");
   });
 
