@@ -39,14 +39,14 @@ return Math.random().toString(36).substring(6);
 app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlDatabase,
-    user: req.cookies["user"]
+    user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    user: req.cookies["user"]
+    user: users[req.cookies.user_id]
   };
   res.render("urls_new", templateVars);
 });
@@ -67,7 +67,7 @@ app.get("/urls/:id", (req, res) => {
    let templateVars = {
     urls: urlDatabase,
     shortURL: req.params.id,
-    userEmail: req.cookies["user"].email
+    user: users[req.cookies.user_id]
   };
   res.render("urls_show", templateVars);
 });
@@ -85,19 +85,30 @@ app.post("/urls/:id", (req, res) => {
   res.redirect('/urls');
 });
 
+
+
+
+
+
+
 app.post("/login", (req, res) => {
   var userEmail = req.body.userEmail;
+ if(!userEmail){
+   return res.status(400).send("Field required");
+  }
   for (var key in users ){
       if(users[key]['email'] === userEmail){
-      var user_id = users[key]['id'];
+        user_id = users[key]['id'];
+        break;
       }
     }
-  res.cookie("user", users[user_id]);
+  res.cookie("user_id", user_id);
+
   res.redirect("/urls");
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie("user");
+  res.clearCookie("user_id");
   res.redirect("/urls");
   });
 
@@ -117,7 +128,7 @@ app.post("/register", (req, res) => {
 
     for (var key in users ){
       if(users[key]['email'] === userEmail){
-      res.status(400).send("User already exists");
+       return res.status(400).send("User already exists");
       }
     }
 
