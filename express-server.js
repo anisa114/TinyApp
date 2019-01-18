@@ -2,19 +2,15 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bcrypt = require('bcrypt');
-var cookieSession = require('cookie-session')
-
+const cookieSession = require('cookie-session')
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-
-
 app.use(cookieSession({
   name: 'session',
   keys: [ "0446774859", "7275461180" ],
   // Cookie Options
   maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
-
 app.set("view engine", "ejs");
 
 const users = {
@@ -29,7 +25,7 @@ const users = {
     password: bcrypt.hashSync("dishwasher-funk", 10)
   },
 }
-var urlDatabase = {
+let urlDatabase = {
   "b2xVn2": {
     longURL : "http://www.lighthouselabs.ca",
     userID : "userRandomID"
@@ -42,8 +38,8 @@ var urlDatabase = {
 
 
 function urlsForUser(id){
-  var filteredDatabase = [];
-  for(var shortkey in urlDatabase){
+  let filteredDatabase = [];
+  for(let shortkey in urlDatabase){
       if(id === urlDatabase[shortkey].userID){
         let data = urlDatabase[shortkey];
         data['shortURL']= shortkey
@@ -59,7 +55,7 @@ return Math.random().toString(36).substring(6);
 //Routes
 
 app.get("/", (req, res) =>{
-  if(req.session.user_id === undefined){
+  if(!req.session.user_id){
     res.redirect("/login");
   }
   else{
@@ -68,7 +64,7 @@ app.get("/", (req, res) =>{
 });
 
 app.get("/urls", (req, res) => {
-  if(req.session.user_id === undefined){
+  if(!req.session.user_id){
     res.render("./partials/_header.ejs");
   }
   else {
@@ -78,29 +74,29 @@ app.get("/urls", (req, res) => {
       user: users[req.session.user_id]
     }
     res.render("urls_index", templateVars);
-    }
+  }
 });
 
 app.get("/urls/new", (req, res) => {
-  var user = users[req.session.user_id];
+  let user = users[req.session.user_id];
   let templateVars = {
     user: users[req.session.user_id]
-  };
-if(req.session.user_id === undefined){
-  res.redirect("/login");
-}
-else{
-  res.render("urls_new", templateVars);
-}
+  }
+  if(!req.session.user_id){
+    res.redirect("/login");
+  }
+  else{
+    res.render("urls_new", templateVars);
+  }
 });
 
 app.post("/urls", (req, res) => {
-var user_id = req.session.user_id
-var shortURL = generateRandomString();
- urlDatabase[shortURL] = {
-  longURL :req.body.longURL,
-  userID  : user_id
-}
+  let user_id = req.session.user_id
+  let shortURL = generateRandomString();
+   urlDatabase[shortURL] = {
+    longURL :req.body.longURL,
+    userID  : user_id
+  }
   res.redirect(`/urls/${shortURL}` )
 });
 
@@ -114,12 +110,12 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-   let templateVars = {
+  let templateVars = {
     urls: urlDatabase,
     shortURL: req.params.id,
     user: users[req.session.user_id]
   };
-  var shortURL = req.params.id;
+  let shortURL = req.params.id;
   if(!urlDatabase[shortURL]){
     res.send("URL for given ID does not exist");
   }
@@ -135,10 +131,10 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-  var shortURL = req.params.id;
+  let shortURL = req.params.id;
   if(req.session.user_id === urlDatabase[shortURL].userID){
-  delete urlDatabase[shortURL];
-  res.redirect('/urls');
+    delete urlDatabase[shortURL];
+    res.redirect('/urls');
   }
   else{
     res.send("You cannot delete a url that is not yours");
@@ -146,39 +142,37 @@ app.post("/urls/:id/delete", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => {
-  var shortURL = req.params.id;
-  var updatedlongURL = req.body.longURL;
+  let shortURL = req.params.id;
+  let updatedlongURL = req.body.longURL;
   urlDatabase[shortURL].longURL= updatedlongURL;
-
   res.redirect('/urls');
 });
 
 app.get("/login", (req, res) => {
   let templateVars = {
-        user: users[req.session.user_id]
-      };
-    if(!req.session.user_id)
-    {
+    user: users[req.session.user_id]
+  };
+  if(!req.session.user_id){
     res.render("login");
-    }
-    else{
-      res.redirect("/urls");
-    }
+  }
+  else {
+    res.redirect("/urls");
+  }
 });
 
 app.post("/login", (req, res) => {
-  var userEmail = req.body.userEmail;
-  var userPassword = req.body.password;
-  var user_id = "";
-  var flag = true;
+  let userEmail = req.body.userEmail;
+  let userPassword = req.body.password;
+  let user_id = "";
+  let flag = true;
  if(!userEmail || !userPassword){
    return res.status(400).send(" Both fields are required");
   }
-  for (var key in users ){
-      if(users[key]['email'] === userEmail){
-        user_id = users[key]['id'];
-        flag = false;
-      }
+  for (let key in users ){
+    if(users[key]['email'] === userEmail){
+      user_id = users[key]['id'];
+      flag = false;
+    }
   }
   if(flag){
     return res.status(403).send("User not registered")
@@ -193,41 +187,38 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   req.session = null
   res.redirect("/urls");
-  });
-  app.get("/register", (req, res) => {
-
-    if(!req.session.user_id)
-    {
-    res.render("user_register");
-    }
-    else{
-      res.redirect("/urls");
-    }
-
 });
+
+app.get("/register", (req, res) => {
+  if(!req.session.user_id){
+    res.render("user_register");
+  }
+  else{
+    res.redirect("/urls");
+  }
+});
+
 app.post("/register", (req, res) => {
-  var userEmail = req.body.email;
+  let userEmail = req.body.email;
   const userPassword = req.body.password;
   const hashedPassword = bcrypt.hashSync(userPassword, 10);
-  var id = generateRandomString();
+  let id = generateRandomString();
 
   //Handling Errors
   if(!userEmail || !userPassword){
    return res.status(400).send("Both fields are required");
   }
-
-    for (var key in users ){
-      if(users[key]['email'] === userEmail){
+  for (let key in users ){
+    if(users[key]['email'] === userEmail){
        return res.status(400).send("User already exists");
-      }
     }
+  }
 
   users[id]= {
   "id" : id,
   "email": userEmail,
   "password" : hashedPassword
   }
-
   res.redirect("/urls");
 });
 
