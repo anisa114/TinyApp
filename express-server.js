@@ -68,7 +68,7 @@ var shortURL = generateRandomString();
   longURL :req.body.longURL,
   userID  : user_id
 }
-console.log(urlDatabase);
+
   res.redirect(`/urls/${shortURL}` )
 });
 
@@ -84,13 +84,24 @@ app.get("/urls/:id", (req, res) => {
     shortURL: req.params.id,
     user: users[req.cookies.user_id]
   };
+  var shortURL = req.params.id;
+  if(req.cookies.user_id === urlDatabase[shortURL].userID){
   res.render("urls_show", templateVars);
+  }
+  else{
+    res.send("You cannot edit a url that is not yours");
+  }
 });
 
 app.post("/urls/:id/delete", (req, res) => {
   var shortURL = req.params.id;
+  if(req.cookies.user_id === urlDatabase[shortURL].userID){
   delete urlDatabase[shortURL];
   res.redirect('/urls');
+  }
+  else{
+    res.send("You cannot delete a url that is not yours");
+  }
 });
 
 app.post("/urls/:id", (req, res) => {
