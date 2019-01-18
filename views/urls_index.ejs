@@ -5,12 +5,12 @@
 </head>
 <body>
   <% include ./partials/_header.ejs %>
-  <% for(var shortkey in urls){ %>
   <ul>
-    <li>Shortened Form: <strong> <%= shortkey %> </strong></li>
-    <li>Full URL: <strong> <%= urls[shortkey].longURL %> </strong></li>
-    <a href="/urls/<%= shortkey %> ">Edit</a>
-    <form method="POST" action="/urls/<%= shortkey %>/delete">
+     <% for(var element of filteredDatabase){ %>
+    <li>Shortened Form: <strong> <%= element.shortURL %> </strong></li>
+     <li>Full URL: <strong> <%= element.longURL %> </strong></li>
+    <a href="/urls/<%= element.shortURL %> ">Edit</a>
+    <form method="POST" action="/urls/<%= element.shortURL %>/delete">
     <button type="submit" > Delete URL</button>
     </form>
 

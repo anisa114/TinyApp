@@ -30,22 +30,39 @@ var urlDatabase = {
   },
   "9sm5xK": {
    longURL: "http://www.google.com",
-   userID : "userRandomID"
+   userID : "user2RandomID"
   }
 };
 
 
+function urlsForUser(id){
+  var filteredDatabase = [];
+  for(var shortkey in urlDatabase){
+      if(id === urlDatabase[shortkey].userID){
+        let data = urlDatabase[shortkey];
+        data['shortURL']= shortkey
+         filteredDatabase.push (data);
+      }
+  }
+  return filteredDatabase;
+}
 function generateRandomString() {
 return Math.random().toString(36).substring(6);
 }
 
 //Routes
 app.get("/urls", (req, res) => {
+  if(req.cookies.user_id === undefined){
+    res.render("./partials/_header.ejs");
+  }
+  else {
+  let filteredData = urlsForUser(req.cookies.user_id)
   let templateVars = {
-    urls: urlDatabase,
+    filteredDatabase: filteredData,
     user: users[req.cookies.user_id]
   };
   res.render("urls_index", templateVars);
+  }
 });
 
 app.get("/urls/new", (req, res) => {
@@ -53,7 +70,7 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.cookies.user_id]
   };
-if(typeof(user) === "undefined" && !user){
+if(typeof(user) === undefined && !user){
   res.redirect("/login");
 }
 else{
@@ -68,13 +85,12 @@ var shortURL = generateRandomString();
   longURL :req.body.longURL,
   userID  : user_id
 }
-
   res.redirect(`/urls/${shortURL}` )
 });
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL][longURL];
+  let longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
 
