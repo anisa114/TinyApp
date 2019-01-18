@@ -6,7 +6,7 @@
 <body>
   <% include ./partials/_header.ejs %>
   <ul>
-     <% for(var element of filteredDatabase){ %>
+     <% for(let element of filteredDatabase){ %>
     <li>Shortened Form: <strong> <%= element.shortURL %> </strong></li>
      <li>Full URL: <strong> <%= element.longURL %> </strong></li>
     <a href="/urls/<%= element.shortURL %> ">Edit</a>
@@ -16,10 +16,6 @@
 
   </ul>
 <% } %>
-
-
-
-
 <a href="/urls/new">Create a New Short Link</a>
 </body>
 </html>

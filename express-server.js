@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const bcrypt = require('bcrypt');
 const cookieSession = require('cookie-session')
 const bodyParser = require("body-parser");
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieSession({
   name: 'session',
@@ -25,6 +26,7 @@ const users = {
     password: bcrypt.hashSync("dishwasher-funk", 10)
   },
 }
+
 let urlDatabase = {
   "b2xVn2": {
     longURL : "http://www.lighthouselabs.ca",
@@ -42,19 +44,30 @@ function urlsForUser(id){
   for(let shortkey in urlDatabase){
       if(id === urlDatabase[shortkey].userID){
         let data = urlDatabase[shortkey];
-        data['shortURL']= shortkey
+        data['shortURL'] = shortkey
          filteredDatabase.push (data);
       }
   }
   return filteredDatabase;
 }
+
+
+function userEmailExists(user_email){
+  for (let key in users ){
+    if(users[key]['email'] === user_email){
+      user_id = users[key]['id'];
+      return user_id
+    }
+  }
+}
+
 function generateRandomString() {
-return Math.random().toString(36).substring(6);
+  return Math.random().toString(36).substring(6);
 }
 
 //Routes
 
-app.get("/", (req, res) =>{
+app.get("/", (req, res) => {
   if(!req.session.user_id){
     res.redirect("/login");
   }
@@ -93,7 +106,7 @@ app.get("/urls/new", (req, res) => {
 app.post("/urls", (req, res) => {
   let user_id = req.session.user_id
   let shortURL = generateRandomString();
-   urlDatabase[shortURL] = {
+  urlDatabase[shortURL] = {
     longURL :req.body.longURL,
     userID  : user_id
   }
@@ -144,7 +157,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   let shortURL = req.params.id;
   let updatedlongURL = req.body.longURL;
-  urlDatabase[shortURL].longURL= updatedlongURL;
+  urlDatabase[shortURL].longURL = updatedlongURL;
   res.redirect('/urls');
 });
 
@@ -163,25 +176,27 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   let userEmail = req.body.userEmail;
   let userPassword = req.body.password;
-  let user_id = "";
-  let flag = true;
- if(!userEmail || !userPassword){
-   return res.status(400).send(" Both fields are required");
+
+
+  let user_id = userEmailExists(userEmail);
+  if(!userEmail || !userPassword){
+    return res.status(400).send(" Both fields are required");
   }
-  for (let key in users ){
-    if(users[key]['email'] === userEmail){
-      user_id = users[key]['id'];
-      flag = false;
-    }
-  }
-  if(flag){
+
+
+  else if (!user_id){
     return res.status(403).send("User not registered")
   }
-  if(!bcrypt.compareSync(userPassword, users[user_id]['password'])){
+
+  else if(!bcrypt.compareSync(userPassword, users[user_id]['password'])){
     return res.status(403).send("password is wrong");
   }
+
+  else {
   req.session.user_id = user_id;
   res.redirect("/urls");
+  }
+
 });
 
 app.post("/logout", (req, res) => {
@@ -214,7 +229,7 @@ app.post("/register", (req, res) => {
     }
   }
 
-  users[id]= {
+  users[id] = {
   "id" : id,
   "email": userEmail,
   "password" : hashedPassword
