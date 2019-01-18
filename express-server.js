@@ -24,15 +24,20 @@ const users = {
   },
 }
 var urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  "b2xVn2": {
+    longURL : "http://www.lighthouselabs.ca",
+    userID : "userRandomID"
+  },
+  "9sm5xK": {
+   longURL: "http://www.google.com",
+   userID : "userRandomID"
+  }
 };
 
 
 function generateRandomString() {
 return Math.random().toString(36).substring(6);
 }
-
 
 //Routes
 app.get("/urls", (req, res) => {
@@ -57,14 +62,19 @@ else{
 });
 
 app.post("/urls", (req, res) => {
-  var shortURL = generateRandomString();
-  urlDatabase[shortURL]= req.body.longURL;
+var user_id = req.cookies.user_id
+var shortURL = generateRandomString();
+ urlDatabase[shortURL] = {
+  longURL :req.body.longURL,
+  userID  : user_id
+}
+console.log(urlDatabase);
   res.redirect(`/urls/${shortURL}` )
 });
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
-  let longURL = urlDatabase[shortURL];
+  let longURL = urlDatabase[shortURL][longURL];
   res.redirect(longURL);
 });
 
@@ -86,7 +96,8 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   var shortURL = req.params.id;
   var updatedlongURL = req.body.longURL;
-  urlDatabase[shortURL]= updatedlongURL;
+  urlDatabase[shortURL].longURL= updatedlongURL;
+
   res.redirect('/urls');
 });
 

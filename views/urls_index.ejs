@@ -8,7 +8,7 @@
   <% for(var shortkey in urls){ %>
   <ul>
     <li>Shortened Form: <strong> <%= shortkey %> </strong></li>
-    <li>Full URL: <strong> <%= urls[shortkey] %> </strong></li>
+    <li>Full URL: <strong> <%= urls[shortkey].longURL %> </strong></li>
     <a href="/urls/<%= shortkey %> ">Edit</a>
     <form method="POST" action="/urls/<%= shortkey %>/delete">
     <button type="submit" > Delete URL</button>
