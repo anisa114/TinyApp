@@ -21,12 +21,12 @@ const users = {
   "userRandomID": {
     id: "userRandomID",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur"
+    password: bcrypt.hashSync("purple-monkey-dinosaur" ,10)
   },
  "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: bcrypt.hashSync("dishwasher-funk", 10)
   },
 }
 var urlDatabase = {
@@ -57,18 +57,28 @@ return Math.random().toString(36).substring(6);
 }
 
 //Routes
+
+app.get("/", (req, res) =>{
+  if(req.session.user_id === undefined){
+    res.redirect("/login");
+  }
+  else{
+    res.redirect("/urls");
+  }
+});
+
 app.get("/urls", (req, res) => {
   if(req.session.user_id === undefined){
     res.render("./partials/_header.ejs");
   }
   else {
-  let filteredData = urlsForUser(req.session.user_id)
-  let templateVars = {
-    filteredDatabase: filteredData,
-    user: users[req.session.user_id]
-  };
-  res.render("urls_index", templateVars);
-  }
+    let filteredData = urlsForUser(req.session.user_id)
+    let templateVars = {
+      filteredDatabase: filteredData,
+      user: users[req.session.user_id]
+    }
+    res.render("urls_index", templateVars);
+    }
 });
 
 app.get("/urls/new", (req, res) => {
@@ -76,7 +86,7 @@ app.get("/urls/new", (req, res) => {
   let templateVars = {
     user: users[req.session.user_id]
   };
-if(typeof(user) === undefined && !user){
+if(req.session.user_id === undefined){
   res.redirect("/login");
 }
 else{
@@ -96,6 +106,9 @@ var shortURL = generateRandomString();
 
 app.get("/u/:shortURL", (req, res) => {
   let shortURL = req.params.shortURL;
+  if(!urlDatabase[shortURL]){
+    res.send("URL for the given ID does not exist")
+  }
   let longURL = urlDatabase[shortURL].longURL;
   res.redirect(longURL);
 });
@@ -107,11 +120,17 @@ app.get("/urls/:id", (req, res) => {
     user: users[req.session.user_id]
   };
   var shortURL = req.params.id;
-  if(req.session.user_id === urlDatabase[shortURL].userID){
+  if(!urlDatabase[shortURL]){
+    res.send("URL for given ID does not exist");
+  }
+  else if(!req.session.user_id){
+    res.send("Can not view becuase user is not logged in ")
+  }
+  else if(req.session.user_id === urlDatabase[shortURL].userID){
   res.render("urls_show", templateVars);
   }
   else{
-    res.send("You cannot edit a url that is not yours");
+    res.send("You cannot acesss a URL that is not yours");
   }
 });
 
@@ -135,10 +154,16 @@ app.post("/urls/:id", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-let templateVars = {
-    user: users[req.session.user_id]
-  };
-res.render("login");
+  let templateVars = {
+        user: users[req.session.user_id]
+      };
+    if(!req.session.user_id)
+    {
+    res.render("login");
+    }
+    else{
+      res.redirect("/urls");
+    }
 });
 
 app.post("/login", (req, res) => {
@@ -170,9 +195,16 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
   });
   app.get("/register", (req, res) => {
-  res.render("user_register");
-});
 
+    if(!req.session.user_id)
+    {
+    res.render("user_register");
+    }
+    else{
+      res.redirect("/urls");
+    }
+
+});
 app.post("/register", (req, res) => {
   var userEmail = req.body.email;
   const userPassword = req.body.password;
