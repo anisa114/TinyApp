@@ -1,8 +1,8 @@
-#TinyApp Porject
+# TinyApp Porject
 
 TinyApp is a full stack web application built with Node and Express that allows users to shorten URLs
 
-##Dependencies 
+## Dependencies 
 -Node.js
 -Express
 -EJS
@@ -11,7 +11,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 -cookie-session
 
 
-##Getting Started
+## Getting Started
 
 
 -Install all dependencies (using the `npm install` command).s
